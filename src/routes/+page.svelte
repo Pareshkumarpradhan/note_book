@@ -3,7 +3,6 @@
 	import { Database, Store, type StoreArgs } from '@cloudparker/easy-idb';
 	import { onMount } from 'svelte';
 	import moment from 'moment';
-	
 
 	let notesStore: Store;
 	let db: Database | null = null;
@@ -13,7 +12,6 @@
 
 	let myNotes: { _id: number; note: string }[] = [];
 	// let editedNote: string = '';
-  
 
 	async function initDataBase() {
 		db = new Database({ name: dbName, version, stores: storeDefinitions });
@@ -46,23 +44,20 @@
 			goto(`/newnote?note=${noteData}`);
 		}
 	}
-    
+
 	async function handleNoteClick(note: { _id: number; note: string }) {
-     const noteData = encodeURIComponent(note.note);
-     await goto(`/display_note?note=${noteData}`);
-    }
+		const noteData = encodeURIComponent(note.note);
+		await goto(`/display_note?note=${noteData}`);
+	}
 
 	function handleCreateNote() {
-				goto('/newnote');
-			}
+		goto('/newnote');
+	}
 
 	onMount(async () => {
 		await initDataBase();
-		await getNotes();	
+		await getNotes();
 	});
-	
-	
-
 </script>
 
 <link
@@ -72,7 +67,7 @@
 
 <main>
 	<div class="div1">
-		<h1>Welcome to My Note App</h1>
+		<h1><slot></slot></h1>
 		<hr />
 	</div>
 	<div class="div2">
@@ -80,18 +75,18 @@
 			<ul class="ul">
 				{#each myNotes as note}
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<li class="liitem" >
-						<div on:click={()=> handleNoteClick(note)}>
-						{#if note.note.length > 80}
-						{note.note.slice(0,80)}...
-						{:else}
-						{note.note}
-						{/if}
-					</div>
+					<li class="liitem">
+						<div on:click={() => handleNoteClick(note)}>
+							{#if note.note.length > 80}
+								{note.note.slice(0, 80)}...
+							{:else}
+								{note.note}
+							{/if}
+						</div>
 						<button class="btn1 delete-btn" on:click={() => handleDeleteNote(note._id)}>
 							<i class="fa fa-trash" aria-hidden="true" /></button
 						>
-						<button class="btn1 edit-btn"  on:click={() => handleEditNote(note._id)}>
+						<button class="btn1 edit-btn" on:click={() => handleEditNote(note._id)}>
 							<i class="fa fa-pencil" aria-hidden="true" /></button
 						>
 					</li>
@@ -172,9 +167,9 @@
 
 	.delete-btn,
 	.edit-btn {
-		position: absolute; /* Add position absolute */
-		top: 5px; /* Position at the top */
-		right: 5px; /* Position at the right */
+		position: absolute; 
+		top: 5px; 
+		right: 5px; 
 	}
 
 	.delete-btn {

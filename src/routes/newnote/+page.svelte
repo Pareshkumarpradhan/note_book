@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { Database, Store, type StoreArgs } from '@cloudparker/easy-idb';
 	import { onMount } from 'svelte';
-	
 
 	let notesStore: Store;
 	let db: Database | null = null;
