@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { Database, Store, type StoreArgs } from '@cloudparker/easy-idb';
 	import { onMount } from 'svelte';
+	
 
 	let notesStore: Store;
 	let db: Database | null = null;
@@ -10,6 +11,8 @@
 	let storeDefinitions: StoreArgs[] = [{ name: 'notes', primaryKey: '_id', autoIncrement: true }];
 
 	let note: string = '';
+	let noteId: number | null = null;
+	let myNotes: { _id: number; note: string }[] = [];
 
 	async function initDataBase() {
 		db = new Database({ name: dbName, version, stores: storeDefinitions });
@@ -19,7 +22,20 @@
 
 	async function handleSaveNote() {
 		console.log('handleSaveNote');
-		await notesStore.insert({ note: note });
+		if(noteId) {
+			const existingNote = myNotes.find((note) => note._id === noteId);
+			// console.log(existingNote);
+			if(existingNote){
+
+				await notesStore.update( { _id: noteId },{note: note});
+			}
+			else{
+				await notesStore.insert({ note: note });
+			}
+		}
+		else{
+			await notesStore.insert({ note: note });
+		}
 		note = '';
 		goto('/');
 	}
@@ -28,15 +44,27 @@
 		goto('/');
 	}
 
-	onMount(() => {
+	onMount(async() => {
 		initDataBase();
+
+		const searchParams = new URLSearchParams(location.search);
+		const noteData = searchParams.get('note');
+		const idParam = searchParams.get('id');
+		note = noteData ? decodeURIComponent(noteData) : '';
+
+		if(idParam) {
+			noteId = Number(idParam);
+		};
 	});
+
+	
 </script>
 
 <main>
 	<textarea class="textarea" bind:value={note} placeholder="Write your note here" />
 	<button class="btn1" on:click={handleSaveNote}>Save Note</button>
 	<button class="btn2" on:click={handleCancelNote}>Cancel Note</button>
+	
 </main>
 
 <style>

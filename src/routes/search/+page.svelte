@@ -1,11 +1,14 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation';
-
+	
 	function handleGoBack() {
-		goto('/');
+	  goto('/');
 	}
-</script>
-
-<main>
+  </script>
+  
+  <main>
+	
 	<button on:click={handleGoBack}>Go Back</button>
-</main>
+  </main>
+	
+ 

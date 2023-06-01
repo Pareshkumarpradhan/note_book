@@ -2,8 +2,8 @@
 	import { goto } from '$app/navigation';
 	import { Database, Store, type StoreArgs } from '@cloudparker/easy-idb';
 	import { onMount } from 'svelte';
-	import moment from 'moment';
-
+	
+	
 	let notesStore: Store;
 	let db: Database | null = null;
 	let dbName = 'note_book_db';
@@ -12,6 +12,8 @@
 
 	let myNotes: { _id: number; note: string }[] = [];
 	// let editedNote: string = '';
+	
+	
 
 	async function initDataBase() {
 		db = new Database({ name: dbName, version, stores: storeDefinitions });
@@ -41,7 +43,7 @@
 		if (note) {
 			const noteData = encodeURIComponent(note.note);
 			console.log(noteData);
-			goto(`/newnote?note=${noteData}`);
+			goto(`/newnote?note=${noteData} & id=${id}`);
 		}
 	}
 
@@ -58,6 +60,8 @@
 		await initDataBase();
 		await getNotes();
 	});
+	
+	
 </script>
 
 <link

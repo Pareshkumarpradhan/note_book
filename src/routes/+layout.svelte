@@ -1,9 +1,12 @@
-<script>
+<script lang='ts'>
 	import { goto } from '$app/navigation';
+	
 
 	function handleSearch() {
 		goto('/search');
 	}
+
+	
 </script>
 
 <link

@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	
 
 	let note: string;
+	
 
 	onMount(() => {
 		// Retrieve the note data from the URL parameters
