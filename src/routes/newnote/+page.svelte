@@ -1,70 +1,50 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Database, Store, type StoreArgs } from '@cloudparker/easy-idb';
+	import { notesStore } from '$lib/services/app-service';
 	import { onMount } from 'svelte';
-	
-
-	let notesStore: Store;
-	let db: Database | null = null;
-	let dbName = 'note_book_db';
-	let version = 1;
-	let storeDefinitions: StoreArgs[] = [{ name: 'notes', primaryKey: '_id', autoIncrement: true }];
 
 	let note: string = '';
 	let noteId: number | null = null;
 	let myNotes: { _id: number; note: string }[] = [];
 
-	async function initDataBase() {
-		db = new Database({ name: dbName, version, stores: storeDefinitions });
-		let results = await db.openDatabase();
-		notesStore = results.notes.store!;
-	}
-
 	async function handleSaveNote() {
 		console.log('handleSaveNote');
-		if(noteId) {
+
+		if (noteId) {
 			const existingNote = myNotes.find((note) => note._id === noteId);
 			// console.log(existingNote);
-			if(existingNote){
+			if (existingNote) {
+				await $notesStore.update({ _id: noteId });
+			} else {
+				await $notesStore.insert({ note: note });
+			}
+		} else {
+			await $notesStore.insert({ note: note });
+		}
 
-				await notesStore.update( { _id: noteId },{note: note});
-			}
-			else{
-				await notesStore.insert({ note: note });
-			}
-		}
-		else{
-			await notesStore.insert({ note: note });
-		}
 		note = '';
-		goto('/');
+		goto('/notes');
 	}
 	async function handleCancelNote() {
 		note = '';
-		goto('/');
+		goto('/notes');
 	}
 
-	onMount(async() => {
-		initDataBase();
-
+	onMount(async () => {
 		const searchParams = new URLSearchParams(location.search);
 		const noteData = searchParams.get('note');
 		const idParam = searchParams.get('id');
 		note = noteData ? decodeURIComponent(noteData) : '';
-
-		if(idParam) {
+		if (idParam) {
 			noteId = Number(idParam);
-		};
+		}
 	});
-
-	
 </script>
 
 <main>
 	<textarea class="textarea" bind:value={note} placeholder="Write your note here" />
 	<button class="btn1" on:click={handleSaveNote}>Save Note</button>
 	<button class="btn2" on:click={handleCancelNote}>Cancel Note</button>
-	
 </main>
 
 <style>

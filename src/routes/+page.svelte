@@ -1,67 +1,40 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Database, Store, type StoreArgs } from '@cloudparker/easy-idb';
+	import { booksStore } from '$lib/services/app-service';
+	import SearchView from '$lib/views/search-view.svelte';
 	import { onMount } from 'svelte';
-	
-	
-	let notesStore: Store;
-	let db: Database | null = null;
-	let dbName = 'note_book_db';
-	let version = 1;
-	let storeDefinitions: StoreArgs[] = [{ name: 'notes', primaryKey: '_id', autoIncrement: true }];
 
-	let myNotes: { _id: number; note: string }[] = [];
-	// let editedNote: string = '';
-	
-	
+	let myBooks: { _id: number; book: string }[] = [];
 
-	async function initDataBase() {
-		db = new Database({ name: dbName, version, stores: storeDefinitions });
-		let results = await db.openDatabase();
-		notesStore = results.notes.store!;
+	async function getBooks() {
+		myBooks = await $booksStore.find();
+		console.log(myBooks);
 	}
 
-	async function getNotes() {
-		myNotes = await notesStore.find();
-		console.log(myNotes);
-	}
-
-	function handleDeleteNote(id: number) {
+	function handleDeleteBook(id: number) {
 		// Find the index of the note with the given id
-		const index = myNotes.findIndex((note) => note._id === id);
+		const index = myBooks.findIndex((book) => book._id === id);
 		if (index !== -1) {
 			// Remove the note from the array
-			myNotes.splice(index, 1);
+			myBooks.splice(index, 1);
 			// Delete the note from the store
-			notesStore.remove({ value: id });
+			$booksStore.remove({ value: id });
 		}
 	}
 
-	async function handleEditNote(id: number) {
-		const note = myNotes.find((note) => note._id === id);
-		console.log(note);
-		if (note) {
-			const noteData = encodeURIComponent(note.note);
-			console.log(noteData);
-			goto(`/newnote?note=${noteData} & id=${id}`);
-		}
-	}
+	function handleEditBook(id: number) {}
 
-	async function handleNoteClick(note: { _id: number; note: string }) {
-		const noteData = encodeURIComponent(note.note);
-		await goto(`/display_note?note=${noteData}`);
-	}
-
-	function handleCreateNote() {
-		goto('/newnote');
+	function handleCreatBook() {
+		goto('/books');
 	}
 
 	onMount(async () => {
-		await initDataBase();
-		await getNotes();
+		getBooks();
 	});
-	
-	
+
+	function handleBookClick(book: { _id: number; book: string }): any {
+		goto('/notes');
+	}
 </script>
 
 <link
@@ -71,42 +44,34 @@
 
 <main>
 	<div class="div1">
-		<h1><slot></slot></h1>
-		<hr />
+		<SearchView />
+	</div>
+	<div>
+		<button class="book" on:click={handleCreatBook}>Creat Books</button>
 	</div>
 	<div class="div2">
-		{#if myNotes.length > 0}
+		{#if myBooks.length > 0}
 			<ul class="ul">
-				{#each myNotes as note}
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
+				{#each myBooks as book}
 					<li class="liitem">
-						<div on:click={() => handleNoteClick(note)}>
-							{#if note.note.length > 80}
-								{note.note.slice(0, 80)}...
-							{:else}
-								{note.note}
-							{/if}
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<div on:click={() => handleBookClick(book)}>
+							<span class="icon"><i class="fa fa-folder" /></span>
+							{book.book}
 						</div>
-						<button class="btn1 delete-btn" on:click={() => handleDeleteNote(note._id)}>
+						<button class="btn1 delete-btn" on:click={() => handleDeleteBook(book._id)}>
 							<i class="fa fa-trash" aria-hidden="true" /></button
 						>
-						<button class="btn1 edit-btn" on:click={() => handleEditNote(note._id)}>
+						<button class="btn1 edit-btn" on:click={() => handleEditBook(book._id)}>
 							<i class="fa fa-pencil" aria-hidden="true" /></button
 						>
 					</li>
 				{/each}
 			</ul>
 		{:else}
-			<p>No notes found.</p>
+			<p>No books found.</p>
 		{/if}
 	</div>
-
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<section class="fab" on:click={handleCreateNote}>
-		<div class="fab_action">
-			<i class="fa fa-plus" />
-		</div>
-	</section>
 </main>
 
 <style>
@@ -120,15 +85,25 @@
 		font-family: Arial, sans-serif;
 	}
 
+	.book {
+		position: fixed;
+		bottom: 20px;
+		right: 20px;
+		padding: 10px 20px;
+		border-radius: 4px;
+		background-color: #fca311;
+		color: #fff;
+		border: none;
+		font-weight: bold;
+		font-size: 16px;
+		cursor: pointer;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	}
+
 	/* Heading */
 	.div1 {
 		text-align: center;
 		margin-bottom: 10px;
-	}
-
-	.div1 h1 {
-		font-size: 28px;
-		color: #333;
 	}
 
 	/* List */
@@ -171,9 +146,9 @@
 
 	.delete-btn,
 	.edit-btn {
-		position: absolute; 
-		top: 5px; 
-		right: 5px; 
+		position: absolute;
+		top: 5px;
+		right: 5px;
 	}
 
 	.delete-btn {
@@ -197,35 +172,13 @@
 		color: #777;
 	}
 
-	/* Floating Action Button */
-	.fab {
-		position: fixed;
-		bottom: 20px;
-		right: 20px;
-		width: 56px;
-		height: 56px;
-		background-color: #5f54fe;
-		border-radius: 50%;
-		box-shadow: 0 2px 4px rgba(163, 163, 252, 0.2);
-		cursor: pointer;
-		z-index: 1;
-		transition: transform 0.3s ease;
+	.icon {
+		display: inline-block;
+		margin-right: 5px;
 	}
 
-	.fab:hover {
-		transform: scale(1.1);
-	}
-
-	.fab_action {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 100%;
-		height: 100%;
-		color: #fff;
-	}
-
-	.fab_action i {
-		font-size: 24px;
+	.icon i {
+		color: #fca311;
+		font-size: 16px;
 	}
 </style>
