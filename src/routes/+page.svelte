@@ -4,12 +4,16 @@
 	import SearchView from '$lib/views/search-view.svelte';
 	import { onMount } from 'svelte';
 
-	let myBooks: { _id: number; book: string }[] = [];
+	let myBooks: {
+		name: any; _id: number; book: string 
+}[] = [];
 
 	async function getBooks() {
+		console.log("getBook");
 		myBooks = await $booksStore.find();
 		console.log(myBooks);
 	}
+
 
 	function handleDeleteBook(id: number) {
 		// Find the index of the note with the given id
@@ -25,16 +29,25 @@
 	function handleEditBook(id: number) {}
 
 	function handleCreatBook() {
-		goto('/books');
+		goto('/book-new');
+	}
+
+	function handleBookClick(book: { _id: number; book: string }): any {
+		goto('/books?bookId=' + book._id);
 	}
 
 	onMount(async () => {
-		getBooks();
+		console.log("home onmount");
+		let unsub = booksStore.subscribe((store)=>{
+			if(store){
+				getBooks();
+				setTimeout(()=>{
+                  unsub && unsub();
+				}, 0);
+			}
+		});
+		
 	});
-
-	function handleBookClick(book: { _id: number; book: string }): any {
-		goto('/notes');
-	}
 </script>
 
 <link
@@ -55,10 +68,10 @@
 				{#each myBooks as book}
 					<li class="liitem">
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
-						<div on:click={() => handleBookClick(book)}>
+						<button on:click={() => handleBookClick(book)}>
 							<span class="icon"><i class="fa fa-folder" /></span>
-							{book.book}
-						</div>
+							{book.name}
+						</button>
 						<button class="btn1 delete-btn" on:click={() => handleDeleteBook(book._id)}>
 							<i class="fa fa-trash" aria-hidden="true" /></button
 						>

@@ -1,48 +1,44 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	
+	import { page } from '$app/stores';
 	import { notesStore } from '$lib/services/app-service';
+	import type { NoteType } from '$lib/types';
 	import { onMount } from 'svelte';
 
-	let note: string = '';
-	let noteId: number | null = null;
-	let myNotes: { _id: number; note: string }[] = [];
+	let bookId: string;
+	let note: NoteType= {};
+	let noteId: string | null = null;
+	
 
 	async function handleSaveNote() {
 		console.log('handleSaveNote');
 
-		if (noteId) {
-			const existingNote = myNotes.find((note) => note._id === noteId);
-			// console.log(existingNote);
-			if (existingNote) {
-				await $notesStore.update({ _id: noteId });
-			} else {
-				await $notesStore.insert({ note: note });
-			}
-		} else {
-			await $notesStore.insert({ note: note });
+		note.text = (note.text || '').trim();
+		if(note.text){
+             if(!noteId){
+				await $notesStore.insert({...note, bookId});
+			 }else{
+				await $notesStore.update(note);
+			 }
 		}
-
-		note = '';
-		goto('/notes');
+	    history.back();
 	}
 	async function handleCancelNote() {
-		note = '';
-		goto('/notes');
+		history.back();
 	}
 
 	onMount(async () => {
-		const searchParams = new URLSearchParams(location.search);
-		const noteData = searchParams.get('note');
-		const idParam = searchParams.get('id');
-		note = noteData ? decodeURIComponent(noteData) : '';
-		if (idParam) {
-			noteId = Number(idParam);
+		bookId = $page.url.searchParams.get('bookId')!;
+		noteId = $page.url.searchParams.get('noteId')!;
+
+		if(noteId){
+			note = await $notesStore.get({value: noteId});
 		}
 	});
 </script>
 
 <main>
-	<textarea class="textarea" bind:value={note} placeholder="Write your note here" />
+	<textarea class="textarea" bind:value={note.text} placeholder="Write your note here" />
 	<button class="btn1" on:click={handleSaveNote}>Save Note</button>
 	<button class="btn2" on:click={handleCancelNote}>Cancel Note</button>
 </main>
