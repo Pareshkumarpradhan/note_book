@@ -19,6 +19,8 @@
 		booksStore.set(results.books.store!);
 		notesStore.set(results.notes.store!);
 		notesByBookStore.set(db.getIndexStore('notes', 'bookId')!)
+		console.log(db.getIndexStore('note', 'bookId'))
+		
 	}
 
 	onMount(() => {

@@ -56,7 +56,7 @@
 		position: sticky;
 		top: 0;
 		z-index: 1;
-		width: 340px;
+		width: 400px;
 		
 	}
 

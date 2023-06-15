@@ -18,47 +18,16 @@
 	onMount(() => {});
 </script>
 
-<main>
-	<textarea class="textarea" bind:value={book.name} placeholder="creat your book here" />
-	<button class="btn1" on:click={handleSaveBook}>Save Books</button>
-	<button class="btn2" on:click={handleCancelBook}>Cancel Books</button>
+<main class="container py-4">
+	<div class="mb-3">
+	<textarea class="form-control" bind:value={book.name} placeholder="creat your book here" />
+   </div>
+   <div class="d-grid gap-2">
+	<button class="btn btn-primary"  on:click={handleSaveBook}>Save Books</button>
+	<button class="btn btn-secondary" on:click={handleCancelBook}>Cancel Books</button>
+    </div>
 </main>
 
 <style>
-	main {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		min-height: 100vh;
-		background-color: #f2f2f2;
-		font-family: Arial, sans-serif;
-	}
-
-	.textarea {
-		width: 300px;
-		height: 150px;
-		padding: 10px;
-		border: 1px solid #ccc;
-		border-radius: 4px;
-		margin-bottom: 10px;
-		font-size: 18px;
-	}
-
-	.btn1,
-	.btn2 {
-		display: inline-block;
-		padding: 6px 10px;
-		margin-top: 10px;
-		font-size: 14px;
-		color: #fff;
-		background-color: #521243;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-	}
-
-	.btn2 {
-		margin-left: 10px;
-	}
+	
 </style>

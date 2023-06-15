@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import moment from 'moment';
 	import { notesByBookStore, notesStore } from '$lib/services/app-service';
 	import SearchView from '$lib/views/search-view.svelte';
 	import { page } from '$app/stores';
@@ -12,33 +11,30 @@
 
 	async function loadNotes() {
 		console.log("loadnotes");
+		
 		notes = await $notesByBookStore.find({ value: bookId, desc: true });
 		console.log(notes);
+		
+		
 	}
 
-	function handleDeleteNote(note: NoteType) {
-		// Find the index of the note with the given id
-		// const index = myNotes.findIndex((note) => note._id === id);
-		// if (index !== -1) {
-		// 	// Remove the note from the array
-		// 	myNotes.splice(index, 1);
-		// 	// Delete the note from the store
-		// 	$notesStore.remove({ value: id });
-		// }
+	async function handleDeleteNote(note: NoteType) {
+	const confirmation = confirm('Are you sure you want to delete this note');
+	if(confirmation) {
+		if(note._id !== undefined){
+			await $notesStore.remove({value: note._id});
+		loadNotes();
+		}
+		
 	}
+	} 
 
 	async function handleEditNote(note: NoteType) {
-		// const note = myNotes.find((note) => note._id === id);
-		// console.log(note);
-		// if (note) {
-		// 	const noteData = encodeURIComponent(note.note);
-		// 	console.log(noteData);
-		// 	goto(`/newnote?bookId=` + bookId);
-		// }
+        await goto(`/note-new?bookId=${bookId}&noteId=${note._id}`);
 	}
 
 	async function handleNoteClick(note: NoteType) {
-		await goto(`/note-display?noteId=${note._id}`);
+		await goto(`/note-display?noteId=${note.text}`);
 	}
 
 	function handleCreateNote() {
@@ -62,29 +58,29 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
 />
 
-<main>
-	<div class="div1">
+<main class="container py-4">
+	<div class="mb-4">
 		<SearchView />
 	</div>
-	<div class="div2">
+	<div>
 		{#if notes.length}
-			<ul class="ul">
+			<ul class="list-group">
 				{#each notes as note}
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<li class="liitem">
+					<li class="list-group-item justify-content-between align-items-center">
 						<div on:click={() => handleNoteClick(note)}>
 							<div class="ellipsis">
 								{note.text}
 							</div>
-							<div />
 						</div>
-
-						<button class="btn1 delete-btn" on:click={() => handleDeleteNote(note)}>
+                         <div>
+						<button class="btn btn-danger me-2" on:click={() => handleDeleteNote(note)}>
 							<i class="fa fa-trash" aria-hidden="true" /></button
 						>
-						<button class="btn1 edit-btn" on:click={() => handleEditNote(note)}>
+						<button class="btn btn-primary" on:click={() => handleEditNote(note)}>
 							<i class="fa fa-pencil" aria-hidden="true" /></button
 						>
+					</div>
 					</li>
 				{/each}
 			</ul>
@@ -113,7 +109,7 @@
 	}
 
 	/* List */
-	.ul {
+	.list-group {
 		list-style-type: none;
 		padding: 0;
 		margin: 0;
@@ -121,7 +117,7 @@
 		position: relative;
 	}
 
-	.liitem {
+	.list-group-item{
 		position: relative;
 		padding: 10px;
 		padding-top: 38px;
@@ -134,50 +130,20 @@
 		cursor: pointer;
 	}
 
-	.liitem:hover {
+	.list-group-item:hover {
 		background-color: #f9f9f9;
 	}
 
 	/* Buttons */
-	.btn1 {
-		display: inline-block;
-		padding: 6px 10px;
-		margin-left: 10px;
-		font-size: 14px;
-		color: #fff;
-		background-color: #333;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-	}
 
-	.delete-btn,
-	.edit-btn {
+
+	.btn {
 		position: absolute;
-		top: 5px;
-		right: 5px;
-	}
-
-	.delete-btn {
-		background-color: #ff0000;
-		color: #ffffff;
+		top: 1px;
+		right: 2px;
 		margin-right: 48px;
 	}
-
-	.edit-btn {
-		background-color: #007bff;
-		color: #ffffff;
-	}
-	/* .delete-btn i,
-	.edit-btn i {
-		margin-right: 5px;
-	} */
-
-	/* Empty State */
-	.div2 p {
-		text-align: center;
-		color: #777;
-	}
+	
 
 	/* Floating Action Button */
 	.fab {
