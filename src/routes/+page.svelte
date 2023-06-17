@@ -5,15 +5,19 @@
 	import { onMount } from 'svelte';
 
 	let myBooks: {
-		name: any; _id: number; book: string 
-}[] = [];
+		name: any;
+		_id: number;
+		book: string;
+	}[] = [];
+
+	let showPopup = false;
+	let selectedBookId : number
 
 	async function getBooks() {
-		console.log("getBook");
+		console.log('getBook');
 		myBooks = await $booksStore.find();
 		console.log(myBooks);
 	}
-
 
 	function handleDeleteBook(id: number) {
 		// Find the index of the note with the given id
@@ -36,17 +40,27 @@
 		goto('/books?bookId=' + book._id);
 	}
 
+	
+	function openPopup(bookId: number) {
+		showPopup = true;
+		selectedBookId = bookId;
+	}
+
+	function closePopup() {
+		showPopup = false;
+		// selectedBookId = null;
+	}
+
 	onMount(async () => {
-		console.log("home onmount");
-		let unsub = booksStore.subscribe((store)=>{
-			if(store){
+		console.log('home onmount');
+		let unsub = booksStore.subscribe((store) => {
+			if (store) {
 				getBooks();
-				setTimeout(()=>{
-                  unsub && unsub();
+				setTimeout(() => {
+					unsub && unsub();
 				}, 0);
 			}
 		});
-		
 	});
 </script>
 
@@ -57,39 +71,57 @@
 
 <main>
 	<div class="container">
-	<div class="mt-4">
-		<button class="btn btn-primary create-book-button" on:click={handleCreatBook}>Create Book</button>
+		<div class="mt-4">
+			<button class="btn btn-primary create-book-button" on:click={handleCreatBook}
+				>Create Book</button
+			>
+		</div>
+		<div class="mt-4">
+			{#if myBooks.length > 0}
+				<ul class="list-group">
+					{#each myBooks as book}
+						<li class="list-group-item d-flex justify-content-between align-items-center">
+							<div>
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<button class="btn btn-link" on:click={() => handleBookClick(book)}>
+								<span class="icon"><i class="fa fa-folder" /></span>
+								{book.name}
+							</button>
+						</div>
+							<div class="btn-group">
+								<!-- <button class="btn" on:click={() => handleDeleteBook(book._id)}>Delete</button>
+								<button class="btn" on:click={() => handleEditBook(book._id)}>Edit</button> -->
+								<button class="btn btn-link" on:click={() => openPopup(book._id)}>
+									<i class="fa fa-ellipsis-v"></i>
+								</button>
+							</div>
+						</li>
+					{/each}
+				</ul>
+			{:else}
+				<p>No books found.</p>
+			{/if}
+		</div>
 	</div>
-	<div class="mt-4">
-		{#if myBooks.length > 0}
-			<ul class="list-group">
-				{#each myBooks as book}
-					<li class="list-group-item d-flex justify-content-between align-items-center">
-						<!-- svelte-ignore a11y-click-events-have-key-events -->
-						<button class="btn btn-link" on:click={() => handleBookClick(book)}>
-							<span class="icon"><i class="fa fa-folder" /></span>
-							{book.name}
-						</button>
-						<button class="btn" on:click={() => handleDeleteBook(book._id)}>
-							</button
-						>
-						<button class="btn" on:click={() => handleEditBook(book._id)}>
-							</button
-						>
-					</li>
-				{/each}
-			</ul>
-		{:else}
-			<p>No books found.</p>
-		{/if}
-	</div>
-</div>
+	
+	{#if showPopup}
+		<div class="popup">
+			<div class="popup-content">
+				<button class="btn btn-link popup-close" on:click={() => closePopup()}>
+					<i class="fa fa-times"></i>
+				</button>
+				<div class="popup-buttons">
+					<button class="btn" on:click={() => {handleDeleteBook(selectedBookId); closePopup(); }}>Delete</button>
+					<button class="btn" on:click={() => {handleEditBook(selectedBookId); closePopup(); }}>Edit</button>
+				</div>
+			</div>
+		</div>
+	{/if}
 </main>
 
 <style>
 	main {
 		font-family: Arial, sans-serif;
-
 	}
 	.container {
 		position: relative;
@@ -100,5 +132,40 @@
 		bottom: 20px;
 		right: 20px;
 	}
-	
+	.popup {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: rgba(0, 0, 0, 0.5);
+		z-index: 9999;
+	}
+
+	.popup-content {
+		position: relative;
+		background-color: #fff;
+		padding: 20px;
+		border-radius: 5px;
+	}
+
+	.popup-buttons {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: 20px;
+	}
+
+	.popup-close {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		font-size: 20px;
+		color: #888;
+		background-color: transparent;
+		border: none;
+		cursor: pointer;
+	}
 </style>
