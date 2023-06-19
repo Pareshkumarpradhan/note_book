@@ -30,11 +30,18 @@
 	onMount(async () => {
 		bookId = $page.url.searchParams.get('bookId')!;
 		noteId = $page.url.searchParams.get('noteId')!;
+		console.log(noteId)
 
 		
 		if(noteId){
-			note = await $notesStore.get({value: noteId});
-			console.log(note)
+			const state = history.state as { note: NoteType };
+			if(state && state.note){
+				note = state.note;
+			}else{
+				note = await $notesStore.get({value: noteId});
+			}
+			
+			console.log(note);
 		}
 	
 	});

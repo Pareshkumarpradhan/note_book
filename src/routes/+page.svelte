@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { booksStore } from '$lib/services/app-service';
+	import NavbarView from '$lib/views/navbar-view.svelte';
 	import SearchView from '$lib/views/search-view.svelte';
 	import { onMount } from 'svelte';
 
@@ -11,7 +12,7 @@
 	}[] = [];
 
 	let showPopup = false;
-	let selectedBookId : number
+	let selectedBookId: number;
 
 	async function getBooks() {
 		console.log('getBook');
@@ -40,7 +41,6 @@
 		goto('/books?bookId=' + book._id);
 	}
 
-	
 	function openPopup(bookId: number) {
 		showPopup = true;
 		selectedBookId = bookId;
@@ -71,6 +71,9 @@
 
 <main>
 	<div class="container">
+		<div>
+			<NavbarView />
+		</div>
 		<div class="mt-4">
 			<button class="btn btn-primary create-book-button" on:click={handleCreatBook}
 				>Create Book</button
@@ -82,17 +85,17 @@
 					{#each myBooks as book}
 						<li class="list-group-item d-flex justify-content-between align-items-center">
 							<div>
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<button class="btn btn-link" on:click={() => handleBookClick(book)}>
-								<span class="icon"><i class="fa fa-folder" /></span>
-								{book.name}
-							</button>
-						</div>
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<button class="btn btn-link" on:click={() => handleBookClick(book)}>
+									<span class="icon"><i class="fa fa-folder" /></span>
+									{book.name}
+								</button>
+							</div>
 							<div class="btn-group">
 								<!-- <button class="btn" on:click={() => handleDeleteBook(book._id)}>Delete</button>
 								<button class="btn" on:click={() => handleEditBook(book._id)}>Edit</button> -->
 								<button class="btn btn-link" on:click={() => openPopup(book._id)}>
-									<i class="fa fa-ellipsis-v"></i>
+									<i class="fa fa-ellipsis-v" />
 								</button>
 							</div>
 						</li>
@@ -103,16 +106,28 @@
 			{/if}
 		</div>
 	</div>
-	
+
 	{#if showPopup}
 		<div class="popup">
 			<div class="popup-content">
 				<button class="btn btn-link popup-close" on:click={() => closePopup()}>
-					<i class="fa fa-times"></i>
+					<i class="fa fa-times" />
 				</button>
 				<div class="popup-buttons">
-					<button class="btn" on:click={() => {handleDeleteBook(selectedBookId); closePopup(); }}>Delete</button>
-					<button class="btn" on:click={() => {handleEditBook(selectedBookId); closePopup(); }}>Edit</button>
+					<button
+						class="btn"
+						on:click={() => {
+							handleDeleteBook(selectedBookId);
+							closePopup();
+						}}>Delete</button
+					>
+					<button
+						class="btn"
+						on:click={() => {
+							handleEditBook(selectedBookId);
+							closePopup();
+						}}>Edit</button
+					>
 				</div>
 			</div>
 		</div>
@@ -131,7 +146,64 @@
 		position: fixed;
 		bottom: 20px;
 		right: 20px;
+
+		-webkit-animation: vibrate-1 0.3s linear infinite both;
+		animation: vibrate-1 0.3s linear infinite both;
 	}
+
+	@-webkit-keyframes vibrate-1 {
+		0% {
+			-webkit-transform: translate(0);
+			transform: translate(0);
+		}
+		20% {
+			-webkit-transform: translate(-2px, 2px);
+			transform: translate(-2px, 2px);
+		}
+		40% {
+			-webkit-transform: translate(-2px, -2px);
+			transform: translate(-2px, -2px);
+		}
+		60% {
+			-webkit-transform: translate(2px, 2px);
+			transform: translate(2px, 2px);
+		}
+		80% {
+			-webkit-transform: translate(2px, -2px);
+			transform: translate(2px, -2px);
+		}
+		100% {
+			-webkit-transform: translate(0);
+			transform: translate(0);
+		}
+	}
+	@keyframes vibrate-1 {
+		0% {
+			-webkit-transform: translate(0);
+			transform: translate(0);
+		}
+		20% {
+			-webkit-transform: translate(-2px, 2px);
+			transform: translate(-2px, 2px);
+		}
+		40% {
+			-webkit-transform: translate(-2px, -2px);
+			transform: translate(-2px, -2px);
+		}
+		60% {
+			-webkit-transform: translate(2px, 2px);
+			transform: translate(2px, 2px);
+		}
+		80% {
+			-webkit-transform: translate(2px, -2px);
+			transform: translate(2px, -2px);
+		}
+		100% {
+			-webkit-transform: translate(0);
+			transform: translate(0);
+		}
+	}
+
 	.popup {
 		position: fixed;
 		top: 0;

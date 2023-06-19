@@ -30,7 +30,9 @@
 	} 
 
 	async function handleEditNote(note: NoteType) {
-        await goto(`/note-new?bookId=${bookId}&noteId=${note._id}`);
+        await goto(`/note-new?bookId=${bookId}&noteId=${note._id}`,{
+			state: { note },
+		});
 	}
 
 	async function handleNoteClick(note: NoteType) {

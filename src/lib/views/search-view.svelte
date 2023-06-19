@@ -2,7 +2,7 @@
 	let searchQuery = '';
 
 	function handleSearch() {
-		const noteElements = document.getElementsByClassName('liitem');
+		const noteElements = document.getElementsByClassName('list-group-item');
 		let found = false; // Track if search text is found
 
 		for (let i = 0; i < noteElements.length; i++) {
