@@ -23,6 +23,7 @@
 		}
 	    history.back();
 	}
+	
 	async function handleCancelNote() {
 		history.back();
 	}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { booksStore } from '$lib/services/app-service';
+	import type { BookType } from '$lib/types';
 	import NavbarView from '$lib/views/navbar-view.svelte';
 	import SearchView from '$lib/views/search-view.svelte';
 	import { onMount } from 'svelte';
@@ -10,13 +11,18 @@
 		_id: number;
 		book: string;
 	}[] = [];
+	
+	// let books: BookType[] = [];
 
 	let showPopup = false;
 	let selectedBookId: number;
 
+
+
 	async function getBooks() {
 		console.log('getBook');
 		myBooks = await $booksStore.find();
+        
 		console.log(myBooks);
 	}
 
@@ -31,7 +37,11 @@
 		}
 	}
 
-	function handleEditBook(id: number) {}
+	function handleEditBook(id: number) {
+		goto(`/book-new?bookId=${id}`, {
+			state: { bookId: id }
+		});
+	}
 
 	function handleCreatBook() {
 		goto('/book-new');

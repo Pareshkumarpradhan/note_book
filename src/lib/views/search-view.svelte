@@ -28,7 +28,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
 />
 <header>
-	<h1>Note App</h1>
+	<h1>Note List</h1>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div class="search-container">
 		<input
